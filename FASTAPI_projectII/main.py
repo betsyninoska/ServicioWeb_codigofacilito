@@ -79,20 +79,26 @@ async def create_user(user: UserRequestModel):
 
 @app.post("/reviews", response_model=ReviewResponseModel)
 async def create_review(user_review: ReviewRequestModel):
-    try:
-        
-           user = User.get_by_id(user_review.user_id)
-           movie = Movie.get_by_id(user_review.movie_id)
+    
+    
+    
+    user = User.get_by_id(user_review.user_id)
+    movie = Movie.get_by_id(user_review.movie_id)
 
-           
-           user_review_instance = UserReview.create(
-               user=user,
-               movies=movie,
-               review=user_review.review,
-               score=user_review.score,
-               create_at=datetime.now()
-           )
-           return user_review_instance
+    #condionar antes de crear
+    if User.select().where(User.id == user).first() is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    if Movie.select().where(Movie.id == movie).first() is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    try:        
+        user_review_instance = UserReview.create(
+            user=user,
+            movies=movie,
+            review=user_review.review,
+            score=user_review.score,
+            create_at=datetime.now()
+        )
+        return user_review_instance
     except ValidationError as e:
         return {"error": str(e)}
 

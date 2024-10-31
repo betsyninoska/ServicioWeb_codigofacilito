@@ -47,6 +47,12 @@ class ReviewRequestModel(BaseModel):
      movie_id: int
      review: str
      score :int
+     @field_validator('score')
+     def score_validator(cls,score):
+        if score < 1 or score > 5 :
+            raise ValueError('La longitud debe encontrarse  entre 1 y 5 carácteres ')
+        return score
+
 
 class ReviewResponseModel(ResponseModel):
     id: int
