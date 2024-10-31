@@ -43,14 +43,16 @@ class Movie(Model):
 
 class UserReview(Model):                   
         user=ForeignKeyField(User, backref='reviews')
-        movies=ForeignKeyField(Movie, backref='reviews')
-        score=TextField()
+        movies=ForeignKeyField(Movie)
+        review=TextField()
+        score=int()
         create_at=DateTimeField(default=datetime.now)
-        def __str__(self):
-                return f'{self.user.username} - {self.movie.title}'
+        
         class Meta:
                 database=database
                 table_name = 'UserReview'
+        
 
-
+        def __str__(self):
+                return f'{self.user.username} - {self.movie.title}'
 

@@ -1,14 +1,20 @@
 
 from contextlib import asynccontextmanager
+from datetime import datetime
+
 from fastapi import FastAPI
 from fastapi import HTTPException
 
+from pydantic import ValidationError
 from schemas import UserRequestModel 
 from database import User
 from database import Movie
 from database import UserReview
 from database import database as connection
 from schemas import UserResponseModel
+
+from schemas import ReviewRequestModel
+from schemas import ReviewResponseModel
 
 app = FastAPI(title='Proyecto FASTAPI', Description= 'Proyecto para diseñar películas', version= '1.0')
  
@@ -71,9 +77,26 @@ async def create_user(user: UserRequestModel):
     return user
 
 
+@app.post("/reviews", response_model=ReviewResponseModel)
+async def create_review(user_review: ReviewRequestModel):
+    try:
+        
+           user = User.get_by_id(user_review.user_id)
+           movie = Movie.get_by_id(user_review.movie_id)
 
-@app.post("/reviews")
-async def create_review()
+           
+           user_review_instance = UserReview.create(
+               user=user,
+               movies=movie,
+               review=user_review.review,
+               score=user_review.score,
+               create_at=datetime.now()
+           )
+           return user_review_instance
+    except ValidationError as e:
+        return {"error": str(e)}
+
+
 
 @app.get("/about")
 async def about():
